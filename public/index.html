@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickChat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            min-height: 80vh;
+        }
+        .chat-layout {
+            display: flex;
+            gap: 20px;
+            height: calc(80vh - 40px);
+        }
+        .users-panel {
+            width: 300px;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+        }
+        .chat-panel {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-container {
+            flex-grow: 1;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+            overflow-y: auto;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-container::after {
+            content: '';
+            clear: both;
+            display: table;
+        }
+        .message-input {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        #messageInput {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .login-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        .user-item:hover {
+            background-color: #f8f9fa;
+        }
+        .user-item.selected {
+            background-color: #e3f2fd;
+        }
+        .user-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .user-info {
+            flex-grow: 1;
+        }
+        .user-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .online-status {
+            font-size: 12px;
+            color: #28a745;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 15px;
+            max-width: 70%;
+            word-wrap: break-word;
+            position: relative;
+            clear: both;
+            float: left;
+        }
+        .message.sent {
+            float: right;
+            background-color: #007bff;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        .message.received {
+            background-color: #f1f0f0;
+            color: black;
+            border-bottom-left-radius: 5px;
+        }
+        .message-time {
+            font-size: 0.7em;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+        .message.sent .message-time {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .no-chat-selected {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+        }
+        .profile-info {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .profile-info img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-container" id="loginContainer">
+            <h1>QuickChat</h1>
+            <button id="loginBtn">Login with Google</button>
+        </div>
+        
+        <div id="chatInterface" style="display: none;">
+            <div class="profile-info" id="currentUserProfile">
+                <!-- Current user profile will be inserted here -->
+            </div>
+            
+            <div class="chat-layout">
+                <div class="users-panel">
+                    <h3>Online Users</h3>
+                    <div id="usersList"></div>
+                </div>
+                
+                <div class="chat-panel">
+                    <div id="noChatSelected" class="no-chat-selected">
+                        <h3>Select a user to start chatting</h3>
+                        <p>Choose from the online users list on the left</p>
+                    </div>
+                    
+                    <div id="activeChat" style="display: none; height: 100%;">
+                        <div id="selectedUserInfo" class="profile-info">
+                            <!-- Selected user info will be inserted here -->
+                        </div>
+                        
+                        <div class="chat-container" id="chatMessages"></div>
+                        
+                        <div class="message-input">
+                            <input type="text" id="messageInput" placeholder="Type your message...">
+                            <button id="sendBtn">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/chat.js"></script>
+</body>
+</html>
