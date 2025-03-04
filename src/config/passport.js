@@ -15,10 +15,18 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
+// Get the callback URL based on environment
+const getCallbackURL = () => {
+    const isProduction = process.env.NODE_ENV === 'production';
+    return isProduction 
+        ? `${process.env.RENDER_EXTERNAL_URL}/auth/google/callback`
+        : 'http://localhost:3000/auth/google/callback';
+};
+
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'http://localhost:3000/auth/google/callback'
+    callbackURL: getCallbackURL()
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         // Check if user already exists
