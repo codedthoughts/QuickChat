@@ -47,16 +47,21 @@ app.use(passport.session());
 const clients = new Map();
 
 // Authentication Routes
-app.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
-);
+app.get('/auth/google', (req, res, next) => {
+    console.log('Starting Google auth...');
+    passport.authenticate('google', { 
+        scope: ['profile', 'email']
+    })(req, res, next);
+});
 
-app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' }),
-    (req, res) => {
-        res.redirect('/');
-    }
-);
+app.get('/auth/google/callback', (req, res, next) => {
+    console.log('Received callback from Google');
+    passport.authenticate('google', { 
+        failureRedirect: '/',
+        successRedirect: '/',
+        failureFlash: true
+    })(req, res, next);
+});
 
 app.get('/api/user', (req, res) => {
     res.json(req.user || null);

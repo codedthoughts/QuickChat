@@ -17,10 +17,9 @@ passport.deserializeUser(async (id, done) => {
 
 // Get the callback URL based on environment
 const getCallbackURL = () => {
-    const isProduction = process.env.NODE_ENV === 'production';
-    return isProduction 
-        ? 'https://quickchat-m575.onrender.com/auth/google/callback'
-        : 'http://localhost:3000/auth/google/callback';
+    const url = 'https://quickchat-m575.onrender.com/auth/google/callback';
+    console.log('Using callback URL:', url);
+    return url;
 };
 
 passport.use(new GoogleStrategy({
