@@ -26,23 +26,28 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // Middleware
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' 
-        ? 'https://quickchat-m575.onrender.com' 
-        : 'http://localhost:3000',
+    origin: 'https://quickchat-m575.onrender.com',
     credentials: true
 }));
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
-app.use(session({
+
+// Session configuration
+const sessionMiddleware = session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
-}));
+        secure: true,
+        sameSite: 'none',
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        domain: 'quickchat-m575.onrender.com'
+    },
+    proxy: true
+});
+
+app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -53,19 +58,25 @@ const clients = new Map();
 app.get('/auth/google', (req, res, next) => {
     console.log('Starting Google auth from:', req.headers.host);
     console.log('Protocol:', req.protocol);
+    console.log('Session:', req.session);
+    
     passport.authenticate('google', { 
         scope: ['profile', 'email'],
-        prompt: 'select_account'
+        prompt: 'select_account',
+        accessType: 'offline',
+        state: Math.random().toString(36).substring(7)
     })(req, res, next);
 });
 
 app.get('/auth/google/callback', (req, res, next) => {
     console.log('Received callback from Google');
     console.log('Query:', req.query);
-    passport.authenticate('google', { 
+    console.log('Session:', req.session);
+    
+    passport.authenticate('google', {
         failureRedirect: '/',
-        successRedirect: '/',
-        failureFlash: true
+        failureFlash: true,
+        successRedirect: '/'
     })(req, res, next);
 });
 

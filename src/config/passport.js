@@ -3,35 +3,42 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/User');
 
 passport.serializeUser((user, done) => {
+    console.log('Serializing user:', user.id);
     done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
     try {
+        console.log('Deserializing user:', id);
         const user = await User.findById(id);
         done(null, user);
     } catch (err) {
+        console.error('Deserialize error:', err);
         done(err, null);
     }
 });
 
-const CALLBACK_URL = 'https://quickchat-m575.onrender.com/auth/google/callback';
-console.log('Initializing Google Strategy with:');
-console.log('Client ID:', process.env.GOOGLE_CLIENT_ID);
-console.log('Callback URL:', CALLBACK_URL);
-
-passport.use(new GoogleStrategy({
+const GOOGLE_CONFIG = {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: CALLBACK_URL,
+    callbackURL: 'https://quickchat-m575.onrender.com/auth/google/callback',
     proxy: true
-}, async (accessToken, refreshToken, profile, done) => {
+};
+
+console.log('Google Strategy Config:', {
+    clientID: GOOGLE_CONFIG.clientID,
+    callbackURL: GOOGLE_CONFIG.callbackURL
+});
+
+passport.use(new GoogleStrategy(GOOGLE_CONFIG, async (accessToken, refreshToken, profile, done) => {
     try {
         console.log('Google callback received for user:', profile.emails[0].value);
+        
         // Check if user already exists
         let user = await User.findOne({ googleId: profile.id });
         
         if (user) {
+            console.log('Existing user found:', user.email);
             return done(null, user);
         }
 
@@ -43,6 +50,7 @@ passport.use(new GoogleStrategy({
             profilePicture: profile.photos[0].value
         });
 
+        console.log('New user created:', user.email);
         return done(null, user);
     } catch (err) {
         console.error('Error in Google Strategy callback:', err);
