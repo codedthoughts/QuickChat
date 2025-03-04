@@ -55,15 +55,19 @@ function logout() {
 
 // Initialize WebSocket connection
 function initializeWebSocket() {
-    ws = new WebSocket(`ws://${window.location.host}`);
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsHost = window.location.host;
+    ws = new WebSocket(`${wsProtocol}//${wsHost}`);
 
     ws.onopen = () => {
         console.log('Connected to WebSocket server');
-        // Send authentication
-        ws.send(JSON.stringify({
-            type: 'auth',
-            userId: currentUser._id
-        }));
+        if (currentUser) {
+            // Send authentication
+            ws.send(JSON.stringify({
+                type: 'auth',
+                userId: currentUser._id
+            }));
+        }
     };
 
     ws.onmessage = (event) => {

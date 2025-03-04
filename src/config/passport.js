@@ -19,7 +19,7 @@ passport.deserializeUser(async (id, done) => {
 const getCallbackURL = () => {
     const isProduction = process.env.NODE_ENV === 'production';
     return isProduction 
-        ? `${process.env.RENDER_EXTERNAL_URL}/auth/google/callback`
+        ? 'https://quickchat-m575.onrender.com/auth/google/callback'
         : 'http://localhost:3000/auth/google/callback';
 };
 
