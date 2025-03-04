@@ -15,19 +15,19 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-// Get the callback URL based on environment
-const getCallbackURL = () => {
-    const url = 'https://quickchat-m575.onrender.com/auth/google/callback';
-    console.log('Using callback URL:', url);
-    return url;
-};
+const CALLBACK_URL = 'https://quickchat-m575.onrender.com/auth/google/callback';
+console.log('Initializing Google Strategy with:');
+console.log('Client ID:', process.env.GOOGLE_CLIENT_ID);
+console.log('Callback URL:', CALLBACK_URL);
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: getCallbackURL()
+    callbackURL: CALLBACK_URL,
+    proxy: true
 }, async (accessToken, refreshToken, profile, done) => {
     try {
+        console.log('Google callback received for user:', profile.emails[0].value);
         // Check if user already exists
         let user = await User.findOne({ googleId: profile.id });
         
@@ -45,6 +45,7 @@ passport.use(new GoogleStrategy({
 
         return done(null, user);
     } catch (err) {
+        console.error('Error in Google Strategy callback:', err);
         return done(err, null);
     }
 }));

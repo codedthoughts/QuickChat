@@ -16,6 +16,9 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+// Trust proxy for secure cookies
+app.set('trust proxy', 1);
+
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('Connected to MongoDB Atlas'))
@@ -48,14 +51,17 @@ const clients = new Map();
 
 // Authentication Routes
 app.get('/auth/google', (req, res, next) => {
-    console.log('Starting Google auth...');
+    console.log('Starting Google auth from:', req.headers.host);
+    console.log('Protocol:', req.protocol);
     passport.authenticate('google', { 
-        scope: ['profile', 'email']
+        scope: ['profile', 'email'],
+        prompt: 'select_account'
     })(req, res, next);
 });
 
 app.get('/auth/google/callback', (req, res, next) => {
     console.log('Received callback from Google');
+    console.log('Query:', req.query);
     passport.authenticate('google', { 
         failureRedirect: '/',
         successRedirect: '/',
